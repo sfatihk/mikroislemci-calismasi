@@ -1,13 +1,13 @@
 // isim: Seyyid Fatih KOÇ  nu: 030113003 
 
 int led = 13;   // 13 nolu port cok kullanilacagi icin degiskene ataniyor
-long ogr_numara= 30113003;  // ogrenci numarasi ataniyor
+long studentNumber= 30113003;  // ogrenci numarasi ataniyor
 
 
-void ogr_bilgi();   // ogrenci bilgilerini seri porta yazdirir
-int zaman_hesapla(long ogr_numara, int sondan_kac_hane); // ogr_numara sının, sondan_kac_hane si isteniyorsa hesaplar
-long kuvvet_10(int us); // 10 un us. kuvvetini hesaplar
-void oku_yazdir(int sure);  // seri porttan gelen veriyi okur, seri porta yazdirir
+void studentInfo();   // ogrenci bilgilerini seri porta yazdirir
+int calculateTime(long studentNumber, int lastDigitsCount); // studentNumber sının, lastDigitsCount si isteniyorsa hesaplar
+long powerOf10(int power); // 10 un power. kuvvetini hesaplar
+void readAndWrite(int delayTime);  // seri porttan gelen veriyi okur, seri porta yazdirir
 
 
 void setup() {
@@ -17,45 +17,45 @@ void setup() {
 
 
 void loop() {
-    ogr_bilgi();    //  ogrenci bilgileri seri porttan cikti olarak gonderiliyor
-    int gecikme_suresi = zaman_hesapla(ogr_numara,3);   // ogrenci numarasinin son 3 hanesi, gecikme suresi olarak cekiliyor
+    studentInfo();    //  ogrenci bilgileri seri porttan cikti olarak gonderiliyor
+    int delayTime = calculateTime(studentNumber,3);   // ogrenci numarasinin son 3 hanesi, gecikme delayTimesi olarak cekiliyor
 
     while(1){   // sonsuz dongu baslatiliyor. boylece seri porttan devamli veri girilebilir
-        oku_yazdir(gecikme_suresi); // seri porttan girdi bekleniyor, girdi girildikten sonra;
+        readAndWrite(delayTime); // seri porttan girdi bekleniyor, girdi girildikten sonra;
     }                               // her karakter farklı satirlarda seri port ciktisi olarak gonderiliyor
-}                                   // her karakterden sonra led yaniyor, gecikme_suresi kadar bekleniyor, ardindan led sonuyor
+}                                   // her karakterden sonra led yaniyor, delayTime kadar bekleniyor, ardindan led sonuyor
 
 
-void ogr_bilgi(){
+void studentInfo(){
     Serial.print("Seyyid Fatih ");   // alt satira gecmeden ad yazdirilir
     delay(1500);        // 1.5 sn beklenir
     Serial.println("KOC");  // soyad yazdirilir, ardindan alt satira gecilir
 }
 
 
-int zaman_hesapla(long ogr_numara, int sondan_kac_hane){
-    long bolen = kuvvet_10(sondan_kac_hane+1); //  bolen degeri 10 un kuvveti olarak hesaplanir
-    long bolum = ogr_numara / bolen;     //sayiyi bolen e bolunerek bolum hesaplanir
-    return ogr_numara- bolen*bolum;      //sayidan bolen*bolum cikarilarak son basamaklar hesaplanir
+int calculateTime(long studentNumber, int lastDigitsCount){
+    long bolen = powerOf10(lastDigitsCount+1); //  bolen degeri 10 un kuvveti olarak hesaplanir
+    long bolum = studentNumber / bolen;     //sayiyi bolen e bolunerek bolum hesaplanir
+    return studentNumber- bolen*bolum;      //sayidan bolen*bolum cikarilarak son basamaklar hesaplanir
 }
 
 
-long kuvvet_10(int us){
+long powerOf10(int power){
     long on=1;  
-    for (int i = 0; i < us-1; ++i){     //on degiskeni, us kadar 10 ile carpiliyor
+    for (int i = 0; i < power-1; ++i){     //on degiskeni, power kadar 10 ile carpiliyor
       on *=10; 
     }
     return on;
 }
 
 
-void oku_yazdir(int sure){
-    char okunan_veri = 0;   
+void readAndWrite(int delayTime){
+    char dataRead = 0;   
     if (Serial.available() > 0) {   // seri porttan gelip buffer da bekleyen veri varsa alttaki sorgu calisir
-        okunan_veri = Serial.read();    // buffer daki siradaki veri cekilir
-        Serial.println(okunan_veri);    // veri farkli bir satira yazdirilir
+        dataRead = Serial.read();    // buffer daki siradaki veri cekilir
+        Serial.println(dataRead);    // veri farkli bir satira yazdirilir
         digitalWrite(led, HIGH);    // led yakilir
-        delay(sure);                // sure kadar ms beklenir
+        delay(delayTime);                // delayTime kadar ms beklenir
         digitalWrite(led, LOW);    //  led sondurulur
     }
 }
